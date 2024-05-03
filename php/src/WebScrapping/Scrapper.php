@@ -51,14 +51,15 @@ class Scrapper {
               continue;
             }
           }
-          else if ($paper_id == '') {
+          elseif ($paper_id == '') {
             if ($paper_div->getAttribute("class") == "volume-info") {
               $paper_id = $paper_div->textContent;
               continue;
             }
           }
-          else
+          else {
             break;
+          }
         }
 
         $papers[] = new Paper($paper_id, $paper_title, $paper_type, $paper_authors);
