@@ -19,31 +19,46 @@ class Scrapper {
 
     $papers = [];
     foreach ($dom_anchors as $anchor) {
-      if ($anchor->getAttribute("class") == "paper-card p-lg bd-gradient-left") {
+      if (str_contains($anchor->getAttribute("class"), "paper-card")) {
         $base_node = $anchor;
 
         $paper_title = $base_node->getElementsByTagName("h4")[0]->textContent;
 
-        $authors = $base_node->getElementsByTagName("div")[0]->getElementsByTagName("span");
+        $authors = $base_node->getElementsByTagName("span");
 
         $paper_authors = [];
         foreach ($authors as $author) {
-          $author_institutions = $author->getAttribute("title");
-
-          if ($author_institutions != '') {
+          if ($author->getAttribute("title") != '') {
             $formatted_name = preg_replace(['/\s{2,}/'], ' ', $author->textContent);
             $formatted_name = trim($formatted_name, ' ;');
             $formatted_name = ucwords(strtolower($formatted_name));
 
             $author_name = $formatted_name;
+            $author_institutions = $author->getAttribute("title");
+
             $paper_authors[] = new Person($author_name, $author_institutions);
           }
         }
 
-        $paper_infos = $base_node->getElementsByTagName("div")[1]->getElementsByTagName("div");
+        $paper_type = '';
+        $paper_id = '';
+        $paper_divs = $base_node->getElementsByTagName("div");
 
-        $paper_type = $paper_infos[0]->textContent;
-        $paper_id = $paper_infos[1]->getElementsByTagName("div")[1]->textContent;
+        foreach ($paper_divs as $paper_div) {
+          if ($paper_div->getAttribute("class") == "tags mr-sm") {
+            $paper_type = $paper_div->textContent;
+          }
+          elseif ($paper_div->getAttribute("class") == "volume-info") {
+            $paper_id = $paper_div->textContent;
+          }
+          else {
+            continue;
+          }
+
+          if ($paper_id != '' && $paper_type != '') {
+            break;
+          }
+        }
 
         $papers[] = new Paper($paper_id, $paper_title, $paper_type, $paper_authors);
       }
