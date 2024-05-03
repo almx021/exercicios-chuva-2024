@@ -45,19 +45,17 @@ class Scrapper {
         $paper_divs = $base_node->getElementsByTagName("div");
 
         foreach ($paper_divs as $paper_div) {
-          if ($paper_type == '') {
-            if ($paper_div->getAttribute("class") == "tags mr-sm") {
-              $paper_type = $paper_div->textContent;
-              continue;
-            }
+          if ($paper_div->getAttribute("class") == "tags mr-sm") {
+            $paper_type = $paper_div->textContent;
           }
-          elseif ($paper_id == '') {
-            if ($paper_div->getAttribute("class") == "volume-info") {
-              $paper_id = $paper_div->textContent;
-              continue;
-            }
+          elseif ($paper_div->getAttribute("class") == "volume-info") {
+            $paper_id = $paper_div->textContent;
           }
           else {
+            continue;
+          }
+
+          if ($paper_id != '' && $paper_type != '') {
             break;
           }
         }
